@@ -1,0 +1,49 @@
+{
+  "name": "Daily Trends",
+  "version": "1.0.0",
+  "description": "Daily Trends app for testing purposes only",
+  "main": "index.js",
+  "scripts": {
+    "start": "tsc && node dist/index.js",
+    "test": "ts-mocha ./src/tests/*test.ts",
+    "tsc": "tsc",
+    "dev": "concurrently \"ts-node-dev src/index.ts --respawn --transpileOnly\" \"docker-compose up\" ",
+    "prod": "tsc && node dist/index.js",
+    "nodemon": "tsc && nodemon src/index.ts"
+  },
+  "nodemonConfig": {
+    "watch": [
+      "src"
+    ]
+  },
+  "author": "Hamro Dev",
+  "license": "For Testing Purposes only",
+  "keywords": [
+    "Node",
+    "JS",
+    "Typescript",
+    "Framework"
+  ],
+  "devDependencies": {
+    "@types/express": "^4.17.13",
+    "@types/node": "^14.17.19",
+    "concurrently": "^6.2.2",
+    "eslint": "^9.2.0",
+    "nodemon": "^3.1.0",
+    "ts-node": "^10.2.1",
+    "ts-node-dev": "^1.1.6"
+  },
+  "dependencies": {
+    "@types/cors": "^2.8.10",
+    "cors": "^2.8.5",
+    "crawlee": "^3.9.2",
+    "dotenv": "^16.4.5",
+    "express": "^4.17.1",
+    "mongodb": "^6.6.1",
+    "node-ts": "^5.1.1",
+    "playwright": "^1.44.0",
+    "then-request": "^6.0.2",
+    "typescript": "^5.4.5",
+    "zod": "^3.23.8"
+  }
+}
