@@ -1,5 +1,5 @@
 import {  PlaywrightCrawler } from 'crawlee';
-import { Article } from './src/modules/feed/feed.models';
+import { Article } from './src/modules/article/article.models';
 
 async function testCrawler(){
     const crawler = new PlaywrightCrawler({
@@ -18,7 +18,8 @@ async function testCrawler(){
                     const place = authorAndPlace? authorAndPlace.split("|")[1] : undefined;
                     const summary =  await scrappedArticle.locator("p").textContent() as string;
                     const date = Date.now().toLocaleString();
-                    const article: Article = { url , author, place, headline, summary, date}
+                    const feed ="temporal";
+                    const article: Article = { url , author, place, headline, summary, date, feed}
                 }
         }
     });

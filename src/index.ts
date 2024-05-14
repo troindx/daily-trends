@@ -1,4 +1,3 @@
-import {config} from 'dotenv';
-import {App} from './app'
+import './app'
 
-const endpoint = new App()
+
