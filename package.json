@@ -6,7 +6,7 @@
   "scripts": {
     "start": "ts-node ./src/index.ts",
     "test": "jest --config=./jest.config.int.js",
-    "test:unit" : "jest --config=./jest.config.unit.js",
+    "test:unit": "jest --config=./jest.config.unit.js",
     "test:int": "docker-compose up -d && jest --config=./jest.config.int.js && docker-compose down"
   },
   "nodemonConfig": {
@@ -43,6 +43,7 @@
     "mongodb": "^6.6.1",
     "mongoose": "^8.3.4",
     "node-ts": "^5.1.1",
+    "reflect-metadata": "^0.2.2",
     "then-request": "^6.0.2",
     "typescript": "^5.4.5",
     "zod": "^3.23.8"

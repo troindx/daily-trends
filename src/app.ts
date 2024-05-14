@@ -8,10 +8,12 @@ import { BaseModule } from './modules/base.module';
 import { errorHandler } from './lib/error/error.handler';
 import config, { AppConfig } from './app.config';
 import { Logger } from './lib/logger/logger';
+import { initializeRoutes } from './lib/routes/routes.handler';
 
 
 export default class App{
   server: express.Application = express();
+  private loadRoutes = initializeRoutes;
   private config : AppConfig = config;
   uid: string | undefined = undefined;
   modules: BaseModule<any>[] = [];
@@ -63,6 +65,10 @@ export default class App{
   private async initModules() : Promise<void> {
     for (let i = 0; i< this.modules.length; i++){
       await this.modules[i].init();
+      const controller = this.modules[i].controller;
+      if (controller){
+        this.loadRoutes(this.server, controller);
+      }
       Logger.log("magenta",this.modules[i].constructor.name, " has been initialized");
     }
   }
@@ -71,7 +77,6 @@ export default class App{
     try {
       await this.loadModules(directoryPath);
       await this.initModules();
-      this.loadRoutes();
       this.server.use(errorHandler);
       this.server.get('/health', (req:Request, res:Response) => {
         return res.status(200).json({ status: 200, message: "Everything seems to be working fine!" });
@@ -84,15 +89,6 @@ export default class App{
     }
     
   }
-
-  loadRoutes(){
-    //set all routes
-    //this.server.post('/auth/login', this.authController.loginValidator, this.authController.login);
-    //this.app.get('/auth/logout', this.authController.logout);
-    //this.app.put('/users/:id/update', [UserController.updateUserValidator, TokenService.checkToken], UserController.update);
-    //this.app.post('/users/:id/delete', [UserController.deleteUserValidator, TokenService.checkToken], UserController.erase);
-  }
-
 }
 
 export const app = new App()

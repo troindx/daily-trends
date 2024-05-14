@@ -1,5 +1,4 @@
 export interface BaseController{
-    routes : any[]
 }
 
 export interface BaseModule<T> {
