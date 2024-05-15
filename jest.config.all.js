@@ -1,5 +1,5 @@
 module.exports = {
-  testRegex: "\\.spec\\.*\\.ts$",
+  testRegex: "^.+\\.spec\\..+\\.ts$",
   testTimeout: 7000,
   transform: {
     "^.+\\.tsx?$": "ts-jest"
