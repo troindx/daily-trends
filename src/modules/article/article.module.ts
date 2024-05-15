@@ -1,17 +1,21 @@
 
 import { Logger } from "../../lib/logger/logger";
-import { BaseModule } from "../base.module";
-import { Article } from "./article.models";
+import { BaseModule, Initiable } from "../base.module";
+import dbModule from "../db/db.module";
+import { ArticleController } from "./article.controller";
+import { Article } from "./article.dto";
 import ArticleService from "./article.service";
 
 
-export class ArticleModule implements BaseModule<Article>{
+export class ArticleModule implements BaseModule<Article>, Initiable{
     service = new ArticleService();
+    controller = new ArticleController();
     hasInitialized = false;
 
     async init(){
+        if (this.hasInitialized) return;
         try {
-            await this.service.init();
+            await dbModule.init();
             this.hasInitialized = true;
         } catch (error) {
             Logger.error("red","Error when initializing Article Module: ", error) 
@@ -19,8 +23,11 @@ export class ArticleModule implements BaseModule<Article>{
     }
 
     async end(){
-        if (this.hasInitialized)
-            await this.service.end();
+        if (this.hasInitialized){
+            await dbModule.end();
+            this.hasInitialized = false;
+        }
+
     }
 }
 const articleModule = new ArticleModule();

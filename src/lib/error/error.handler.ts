@@ -1,3 +1,7 @@
+import { z } from "zod";
+import { Logger } from "../logger/logger";
+import { NextFunction, Request,  Response } from "express";
+
 export class HttpError extends Error {
     statusCode: number;
     constructor( message: string | undefined, statusCode: number, stack?:unknown) {
@@ -20,9 +24,11 @@ export class InternalServerErrorException extends HttpError {
 }
 
 // Error handler middleware
-export function errorHandler(err: any, req: any, res:any, next:any) {
-    const statusCode = err.statusCode || 500;
-    console.error(err.message);
-    console.error(err.stack);
-    return res.status(statusCode).send(err.message);
+export const validationErrorHandler = (err: any, req: Request, res:Response, next:NextFunction) => {
+    if (err instanceof z.ZodError) {
+        Logger.error("red", "Errors on validation: ",req.url, err.message);
+        res.status(400).send();
+    }else if (err instanceof HttpError){
+        res.status(err.statusCode).send();
+    } 
 }

@@ -1,4 +1,4 @@
-import { Article } from "./article.models";
+import { Article, FeedCodeSchema } from "./article.dto";
 import { ArticleModule } from "./article.module";
 import { faker } from '@faker-js/faker';
 
@@ -9,7 +9,8 @@ const article1 : Article = {
     headline : faker.lorem.sentence(),
     summary : faker.lorem.lines(),
     date: faker.date.recent().toDateString(),
-    feed: faker.database.mongodbObjectId()
+    feed: faker.helpers.arrayElement(FeedCodeSchema._def.values),
+    image : faker.internet.url(),
 }
 let dbArticle : Article;
 
@@ -21,6 +22,7 @@ describe("Article Module Integration Test", () => {
     });
     it("Module initializes with service", () => {
         expect(service).toBeTruthy()
+        expect(module.hasInitialized).toBe(true);
     });
     it("Module creates an article", async () => {
         dbArticle = await service.create(article1);
@@ -33,6 +35,18 @@ describe("Article Module Integration Test", () => {
         expect(updatedArticle._id).toBeTruthy();
         expect (updatedArticle._id).toEqual(dbArticle._id);
         expect(updatedArticle.author).toEqual("Juan Vilar");
+    });
+    it("Finds many articles (only one)", async () => {
+        const manyArticles = await service.findMany();
+        expect(manyArticles[0]._id).toBeTruthy();
+        expect (manyArticles[0]._id).toEqual(dbArticle._id);
+        expect(manyArticles[0].author).toEqual("Juan Vilar");
+    });
+    it("Finds by feed (only one)", async () => {
+        const manyArticles = await service.findByFeed(article1.feed);
+        expect(manyArticles[0]._id).toBeTruthy();
+        expect (manyArticles[0]._id).toEqual(dbArticle._id);
+        expect(manyArticles[0].author).toEqual("Juan Vilar");
     });
 
     it ("Module deletes article", async () => {

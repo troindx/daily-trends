@@ -9,6 +9,7 @@ export interface AppConfig {
     MONGODB_PORT : number;
     MONGO_TEST_USER: string;
     MONGO_TEST_PASSWORD: string;
+    DEFAULT_PAGE_SIZE: number;
 }
 
 const config = dotenv.config()

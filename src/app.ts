@@ -4,19 +4,23 @@ import cors from 'cors';
 
 import fs from 'fs';
 import path from 'path';
-import { BaseModule } from './modules/base.module';
-import { errorHandler } from './lib/error/error.handler';
+import { BaseModule, Initiable } from './modules/base.module';
+import { validationErrorHandler } from './lib/error/error.handler';
 import config, { AppConfig } from './app.config';
 import { Logger } from './lib/logger/logger';
 import { initializeRoutes } from './lib/routes/routes.handler';
+import { IncomingMessage, Server, ServerResponse } from 'http';
+import bodyParser from 'body-parser';
 
 
-export default class App{
+export class App implements Initiable{
   server: express.Application = express();
   private loadRoutes = initializeRoutes;
   private config : AppConfig = config;
   uid: string | undefined = undefined;
-  modules: BaseModule<any>[] = [];
+  modules:  BaseModule<any>[] = [];
+  hasInitialized: boolean = false;
+  private endPoint:Server<typeof IncomingMessage, typeof ServerResponse> | undefined;
 
   private async loadModules(directoryPath: string): Promise<void> {
     
@@ -42,15 +46,12 @@ export default class App{
 }
 
   start(){
-    this.server.use(express.json({limit: '540kb'}));
-    this.server.use(cors({
-      credentials: true,
-      preflightContinue: true,
-      exposedHeaders: ['Token', 'user_id'],
-      allowedHeaders: 'Token, content-type, user_id'
-    }));
-    this.server.options('*', (req, res) => {res.json({status: 'OK'});});
-    this.server.use(errorHandler);
+    this.server.get('/health', (req:Request, res:Response) => {
+      return res.status(200).json({ status: 200, message: "Everything seems to be working fine!" });
+    });
+    this.endPoint=this.server.listen(this.config.DEFAULT_PORT,  () => {
+      Logger.log("green", 'App listening on port: ', this.config.DEFAULT_PORT);
+    });
   }
  
 
@@ -58,40 +59,68 @@ export default class App{
     Logger.log("yellow","Starting Daily Trends Application.")
     this.uid = process.env.UID;
     if (!this.config) throw new Error("Config not loaded properly. Set the .env file properly.")
-    this.init();
-    this.start();
+    this.server.use(bodyParser.json());
+    this.server.use(cors({
+      credentials: true,
+      preflightContinue: true,
+      exposedHeaders: ['Token', 'user_id'],
+      allowedHeaders: 'Token, content-type, user_id'
+    }));
+    this.server.options('*', (req, res) => {res.json({status: 'OK'});});
   }
 
   private async initModules() : Promise<void> {
+    if (this.hasInitialized) return;
     for (let i = 0; i< this.modules.length; i++){
-      await this.modules[i].init();
+      const module = this.modules[i] as Initiable
+      if (module.init !== undefined){
+        await module.init();
+        Logger.log("magenta",this.modules[i].constructor.name, " has been initialized");
+      }
       const controller = this.modules[i].controller;
       if (controller){
+        Logger.info("white", `Routes for ${controller.constructor.name}`)
         this.loadRoutes(this.server, controller);
       }
-      Logger.log("magenta",this.modules[i].constructor.name, " has been initialized");
+
+    }
+    this.hasInitialized = true;
+  }
+
+  private async endModules() : Promise<void> {
+    if (!this.hasInitialized) return;
+    for (let i = 0; i< this.modules.length; i++){
+      const module = this.modules[i] as Initiable
+      if (module.end !== undefined){
+        await module.end();
+        Logger.log("blue",this.modules[i].constructor.name, " has ended");
+      }    
     }
   }
-  private async init(): Promise<void> {
+
+  async init(): Promise<void> {
     const directoryPath = path.join(__dirname, 'modules');
     try {
       await this.loadModules(directoryPath);
       await this.initModules();
-      this.server.use(errorHandler);
-      this.server.get('/health', (req:Request, res:Response) => {
-        return res.status(200).json({ status: 200, message: "Everything seems to be working fine!" });
-      });
-      this.server.listen(this.config.DEFAULT_PORT,  () => {
-        Logger.log("green", 'App listening on port: ', this.config.DEFAULT_PORT);
-      });
+      this.server.use(validationErrorHandler);
+      this.start();
     } catch (error) {
         console.error(error);
     }
-    
+  }
+
+  async end() : Promise<void>{
+    await this.endModules();
+    if (this.endPoint)
+      this.endPoint.close(() => {
+        Logger.info("green",'Server has been shut down.');
+    });
   }
 }
 
-export const app = new App()
+const app = new App()
+export default app;
 
 
 

@@ -1,3 +1,5 @@
-import './app'
+import app from './app';
+
+app.init();
 
 

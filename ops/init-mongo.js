@@ -1,8 +1,8 @@
 db.createUser({
-    user:"troindx",
-    password:"1234",
+    user:process.env.MONGO_TEST_USER,
+    pwd:process.env.MONGO_TEST_PASSWORD,
     roles:[{
         role:"readWrite",
-        db:"ntf"
+        db:process.env.MONGO_INITDB_DATABASE
     }]
 })
