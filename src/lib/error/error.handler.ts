@@ -30,5 +30,6 @@ export const validationErrorHandler = (err: any, req: Request, res:Response, nex
         res.status(400).send();
     }else if (err instanceof HttpError){
         res.status(err.statusCode).send();
-    } 
+    }
+    next()
 }

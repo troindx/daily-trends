@@ -17,10 +17,10 @@ export class ElPaisFeeder implements Feed {
                 Logger.info("blue", `Processing: ${request.url}`);
                     if (request.url == this.url){
                         const scrappedArticles = page.locator('article');
-                        for(let i=0;i<=appConfig.CRAWL_ARTICLES; i++){
+                        for(let i=0;i<appConfig.CRAWL_ARTICLES; i++){
                             const scrappedArticle = scrappedArticles.nth(i);
                             const header = scrappedArticle.locator("h2");
-                            const url = await header.locator("a").getAttribute("href") as string;
+                            const url = await header.locator("a").getAttribute("href").catch() as string;
                             this.links.push(url);
                             crawler.addRequests([url]);
                         } Logger.info("blue", "Processing links: ", this.links)
@@ -37,7 +37,7 @@ export class ElPaisFeeder implements Feed {
                         else{
                             image = await header.locator("a.posicionador img").getAttribute("src").catch();
                         }
-                        const author = await all.locator(".a_md .a_md_txt .a_md_a a").innerText().catch();
+                        const author = await all.locator(".a_md .a_md_txt .a_md_a a").nth(0).innerText().catch();
                         const place = (await (all.locator(".a_md .a_md_txt .a_md_f").innerText()).catch()).split("-")[0];
                         const date = await all.locator(".a_md .a_md_txt .a_md_f span time").getAttribute("datetime").catch();
                         const feed = this.type;

@@ -18,7 +18,7 @@ export class ElMundoFeeder implements Feed {
                 Logger.info("white", `Processing: ${request.url}`);
                     if (request.url == this.url){
                         const scrappedArticles = page.locator('article');
-                        for(let i=0;i<=appConfig.CRAWL_ARTICLES; i++){
+                        for(let i=0;i<appConfig.CRAWL_ARTICLES; i++){
                             const scrappedArticle = scrappedArticles.nth(i);
                             const header = scrappedArticle.locator("header");
                             const headline = await header.locator("h2").nth(0).innerText();
@@ -30,10 +30,15 @@ export class ElMundoFeeder implements Feed {
                     } else {
                         const header = page.locator(".ue-l-article .ue-l-article__header-content");
                         const body = page.locator(".ue-l-article .ue-l-article__body");
-                        const headline = await header.locator("h1").nth(0).innerText() || await header.locator("h2").nth(0).innerText().catch();
+                        const headline = await header.locator("h1").nth(0).innerText().catch() || await header.locator("h2").nth(0).innerText().catch();
                         const summary = await header.locator(".ue-c-article__standfirst").innerText().catch();
                         const content = await page.locator(".ue-c-article__body").allTextContents().catch();
-                        const image = await page.locator(".ue-c-article__image").getAttribute("src").catch();
+                        const imageCount = await page.locator("img.ue-c-article__image").count().catch();
+                        let image;
+                        if (imageCount)
+                            image = await page.locator("img.ue-c-article__image").getAttribute("src").catch();
+                        else   
+                            image = "";
                         const author = await body.locator(".ue-c-article__author-name-item").nth(0).innerText().catch();
                         const place = await body.locator(".ue-c-article__author-name-item span").nth(0).innerText().catch();
                         const date = await page.locator(".ue-c-article__bar-footer time").getAttribute("datetime").catch();

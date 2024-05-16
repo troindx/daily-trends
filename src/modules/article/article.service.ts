@@ -14,6 +14,9 @@ export default class ArticleService implements BaseService<Article>{
         return doc.toObject() as Article;
     }
 
+    /**
+     * @throws NotFoundException 
+     */
     async read(id:string) : Promise<Article>{
         const article = await ArticleDocument.findById(id);
         if (!article) {
@@ -23,6 +26,9 @@ export default class ArticleService implements BaseService<Article>{
         } 
     }
 
+    /**
+     * @throws NotFoundException 
+     */
     async update( changes:Article) : Promise<Article>{
         const updatedArticle = await ArticleDocument.findByIdAndUpdate(changes._id, changes, { new: true });
         if (!updatedArticle) {
@@ -31,6 +37,10 @@ export default class ArticleService implements BaseService<Article>{
             return updatedArticle.toObject() as Article;
         }
     }
+    
+    /**
+     * @throws NotFoundException 
+     */
     async delete(id: string):Promise<Article> {
         const deletedArticle = await ArticleDocument.findByIdAndDelete(id);
         if (!deletedArticle) {
@@ -46,7 +56,7 @@ export default class ArticleService implements BaseService<Article>{
         return items;
     }
 
-    async findByFeed(feed: FeedCode, options= {page:1, pageSize:config.DEFAULT_PAGE_SIZE}): Promise<Article[]> {
+    async findByFeed(feed: FeedCode, options= {page:1, pageSize:config.DEFAULT_PAGE_SIZE as number}): Promise<Article[]> {
         const skip = (options.page - 1) * options.pageSize;
         return await ArticleDocument.find({ feed }).skip(skip).limit(options.pageSize);
     }

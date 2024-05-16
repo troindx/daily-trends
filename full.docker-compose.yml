@@ -37,7 +37,5 @@ services:
         ports:
             - "${DEFAULT_PORT}:${DEFAULT_PORT}"
         expose:
-            - ${DEFAULT_PORT}
-        environment:
-            - MONGODB_HOST=db
+            - ${DEFAULT_PORT}-${DEFAULT_PORT}
 

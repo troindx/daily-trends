@@ -10,10 +10,10 @@ COPY ./src ./src
 COPY .env.dist ./
 COPY crawlee.json ./
 COPY jest.config* ./
-COPY .env.dist /.env
-
+COPY .env.dist /app/.env
 RUN npm install
 RUN npx playwright install
+RUN npx playwright install-deps || true
 RUN npm run build
 
 CMD ["npm", "start"]

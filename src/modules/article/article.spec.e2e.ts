@@ -66,11 +66,13 @@ describe("Article module e2e Test", () => {
         .send();
         expect(response.status).toBe(404);
     });
+
     it("GET /Article/:id with malformed id returns 400 ", async() => {
         const response = await request(app.server).get(`/article/34902i`)
         .send();
         expect(response.status).toBe(400);
     });
+    
     it("GET /Article/:id  returns 400 ok", async() => {
         const response = await request(app.server).get(`/article/${article1._id}`)
         .send();

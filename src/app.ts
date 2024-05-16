@@ -43,17 +43,7 @@ export class App implements Initiable{
             }
         }
     }
-}
-
-  start(){
-    this.server.get('/health', (req:Request, res:Response) => {
-      return res.status(200).json({ status: 200, message: "Everything seems to be working fine!" });
-    });
-    this.endPoint=this.server.listen(this.config.DEFAULT_PORT,  () => {
-      Logger.log("green", 'App listening on port: ', this.config.DEFAULT_PORT);
-    });
   }
- 
 
   constructor(){
     Logger.log("yellow","Starting Daily Trends Application.")
@@ -73,7 +63,7 @@ export class App implements Initiable{
     if (this.hasInitialized) return;
     for (let i = 0; i< this.modules.length; i++){
       const module = this.modules[i] as Initiable
-      if (module.init !== undefined){
+      if (typeof module.init !== "undefined"){
         await module.init();
         Logger.log("magenta",this.modules[i].constructor.name, " has been initialized");
       }
@@ -82,16 +72,32 @@ export class App implements Initiable{
         Logger.info("white", `Routes for ${controller.constructor.name}`)
         this.loadRoutes(this.server, controller);
       }
-
     }
-    this.hasInitialized = true;
   }
 
+  /** 
+   * @throws error if problem on listening
+   */
+  start(){
+    if (this.hasInitialized) return;
+    try {
+      this.server.get('/health', (req:Request, res:Response) => {
+        return res.status(200).json({ status: 200, message: "Everything seems to be working fine!" });
+      });
+      this.endPoint=this.server.listen(this.config.DEFAULT_PORT,  () => {
+        Logger.log("green", 'App listening on port: ', this.config.DEFAULT_PORT);
+      });
+    } catch (error) {
+      Logger.error("red", error);
+      throw error;
+    }
+  }
+    
+
   private async endModules() : Promise<void> {
-    if (!this.hasInitialized) return;
     for (let i = 0; i< this.modules.length; i++){
       const module = this.modules[i] as Initiable
-      if (module.end !== undefined){
+      if (typeof module.end !== "undefined"){
         await module.end();
         Logger.log("blue",this.modules[i].constructor.name, " has ended");
       }    
@@ -99,21 +105,33 @@ export class App implements Initiable{
   }
 
   async init(): Promise<void> {
-    const directoryPath = path.join(__dirname, 'modules');
+    if (this.hasInitialized) return;
     try {
+      const directoryPath = path.join(__dirname, 'modules');
       await this.loadModules(directoryPath);
       await this.initModules();
       this.server.use(validationErrorHandler);
       this.start();
+      this.hasInitialized=true;
     } catch (error) {
         console.error(error);
+        throw error;
     }
   }
 
   async end() : Promise<void>{
-    await this.endModules();
-    if (this.endPoint)
-      this.endPoint.close();
+    if (!this.hasInitialized) return;
+    try {
+      await this.endModules();
+      if (this.endPoint)
+        this.endPoint.close(()=> {
+          Logger.info("green", "Endpoint stopped listening");
+      });
+      this.hasInitialized=false;
+    } catch (error) {
+      Logger.error("red", error);
+      throw error;
+    }
   }
 }
 

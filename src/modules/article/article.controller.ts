@@ -41,7 +41,7 @@ export class ArticleController implements BaseController{
             return res.status(200).json( updated );
         } catch (error) {
             Logger.error("red",error);
-            next(error)
+            next(error);
         }
     }
 

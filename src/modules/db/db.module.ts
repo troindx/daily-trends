@@ -15,6 +15,7 @@ export class DbModule implements BaseModule<any>, Initiable{
             this.hasInitialized = true;
         } catch (error) {
             Logger.error("red","Error when initializing Db Module: ", error) 
+            throw error;
         } 
     }
 

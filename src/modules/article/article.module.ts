@@ -12,6 +12,9 @@ export class ArticleModule implements BaseModule<Article>, Initiable{
     controller = new ArticleController();
     hasInitialized = false;
 
+    /**
+     * @throws Error if it fails to initialize 
+     */
     async init(){
         if (this.hasInitialized) return;
         try {
@@ -19,6 +22,7 @@ export class ArticleModule implements BaseModule<Article>, Initiable{
             this.hasInitialized = true;
         } catch (error) {
             Logger.error("red","Error when initializing Article Module: ", error) 
+            throw error;
         } 
     }
 

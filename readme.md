@@ -21,6 +21,18 @@ npm start
 With all of the services defined in docker compose up and running this dev environment should work for testing.
 The project only relies on an internet connection (for scrapping) and a mongo database, so if you don't have Docker installed, please install it because it's about time, but you can also run a mongo db in your own host or using mongo db atlas.
 
+### Dev environment - Docker compose with both nodes
+Make sure that if you run this for production, you change the .env file to fit your needs. env.dist should connect you to a default setting but this is for testing and dev purposes only
+
+```
+docker compose -f ./full.docker-compose.yml up -d
+```
+
+# Usage
+first call the endpoint via /crawl to crawl the news
+then /feed to read the news
+/feed/<elmundo | elpais> to get each of the news from each of the newspapers
+
 ## Testing
 Integration tests and e2e tests require development environment.
 ```
