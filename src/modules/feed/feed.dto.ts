@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { ArticleSchema, FeedCodeSchema } from '../article/article.dto';
+import {NextFunction, Request} from 'express';
 
 
 export const FeedSchema = z.object({
@@ -11,4 +12,7 @@ export const FeedSchema = z.object({
 });
 
 export type Feed = z.infer<typeof FeedSchema>;
-
+export const typeParamsValidator= (req:Request, res: Response, next: NextFunction) => {
+    FeedCodeSchema.parse(req.params.type);
+    next();
+}

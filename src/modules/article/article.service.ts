@@ -1,8 +1,6 @@
-import mongoose from "mongoose";
 import config from "../../app.config";
 import { Article, ArticleDocument, FeedCode } from "./article.dto";
-import { Logger } from "../../lib/logger/logger";
-import { InternalServerErrorException, NotFoundException } from "../../lib/error/error.handler";
+import { NotFoundException } from "../../lib/error/error.handler";
 import { BaseService } from "../base.module";
 
 
@@ -61,6 +59,21 @@ export default class ArticleService implements BaseService<Article>{
         } else {
             const newArticle = new ArticleDocument(articleData);
             return await newArticle.save();
+        }
+    }
+
+    async replaceOrCreateByURL(article: Article): Promise<Article> {
+        let existingArticle = await ArticleDocument.findOne({ url: article.url });
+
+        if (existingArticle) {
+            // If article exists, update it with the new article data
+            existingArticle.set(article);
+            existingArticle = await existingArticle.save();
+            return existingArticle;
+        } else {
+            // If article doesn't exist, create a new one
+            const newArticle = await ArticleDocument.create(article);
+            return newArticle;
         }
     }
 }

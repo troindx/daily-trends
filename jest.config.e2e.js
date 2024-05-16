@@ -4,7 +4,7 @@ module.exports = {
   transform: {
     "^.+\\.tsx?$": "ts-jest"
   },
-  silent:true,
+  silent: true,
   moduleFileExtensions: [
     "ts",
     "tsx",

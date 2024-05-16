@@ -10,6 +10,7 @@ export interface AppConfig {
     MONGO_TEST_USER: string;
     MONGO_TEST_PASSWORD: string;
     DEFAULT_PAGE_SIZE: number;
+    CRAWL_ARTICLES: number;
 }
 
 const config = dotenv.config()

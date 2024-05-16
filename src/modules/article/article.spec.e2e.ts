@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb";
 import app from "../../app";
-import { Article, FeedCodeSchema } from "./article.dto";
+import { Article } from "./article.dto";
 import { faker } from '@faker-js/faker';
 import request from 'supertest';
 

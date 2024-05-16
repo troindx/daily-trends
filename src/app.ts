@@ -113,9 +113,7 @@ export class App implements Initiable{
   async end() : Promise<void>{
     await this.endModules();
     if (this.endPoint)
-      this.endPoint.close(() => {
-        Logger.info("green",'Server has been shut down.');
-    });
+      this.endPoint.close();
   }
 }
 
