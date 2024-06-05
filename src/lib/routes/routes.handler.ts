@@ -27,14 +27,14 @@ export function Post(route: string, validator:Function) {
     };
 }
 
-// Decorator factory for @Get decorator
+// Decorator factory for @Delete decorator
 export function Delete(route: string, validator?:Function) {
     return function(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
         Reflect.defineMetadata(ROUTE_METADATA_KEY, { method: 'delete', route, validator }, target, propertyKey);
     };
 }
 
-// Decorator factory for @Get decorator
+// Decorator factory for @Put decorator
 export function Put(route: string, validator?:Function) {
     return function(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
         Reflect.defineMetadata(ROUTE_METADATA_KEY, { method: 'put', route, validator }, target, propertyKey);

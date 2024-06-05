@@ -1,19 +1,23 @@
 import dotenv from 'dotenv';
+import { z } from 'zod';
 
-export interface AppConfig {
-    DEFAULT_PORT: number;
-    MONGODB_DATABASE_NAME: string;
-    MONGODB_ROOT_USERNAME: string;
-    MONGODB_ROOT_PWD: string;
-    MONGODB_HOST : string;
-    MONGODB_PORT : number;
-    MONGO_TEST_USER: string;
-    MONGO_TEST_PASSWORD: string;
-    DEFAULT_PAGE_SIZE: number;
-    CRAWL_ARTICLES: number;
-}
+
+export const appConfigSchema = z.object({
+    DEFAULT_PORT: z.preprocess((val) => parseInt(val as string), z.number()),
+    MONGODB_DATABASE_NAME: z.string(),
+    MONGODB_ROOT_USERNAME: z.string(),
+    MONGODB_ROOT_PWD: z.string(),
+    MONGODB_HOST : z.string(),
+    MONGODB_PORT : z.preprocess((val) => parseInt(val as string), z.number()),
+    MONGO_TEST_USER: z.string(),
+    MONGO_TEST_PASSWORD: z.string(),
+    DEFAULT_PAGE_SIZE:  z.preprocess((val) => parseInt(val as string), z.number()),
+    CRAWL_ARTICLES:  z.preprocess((val) => parseInt(val as string), z.number()),
+});
+export type AppConfig = z.infer<typeof appConfigSchema>;
 
 const config = dotenv.config()
+const parsed = appConfigSchema.parse(config.parsed);
 if (config.error)
     throw config.error;
-export default config.parsed as unknown as AppConfig;
+export default parsed ;

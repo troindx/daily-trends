@@ -5,12 +5,16 @@ import { Article, createValidator, idParamsValidator, updateValidator } from "./
 import articleModule from "./article.module";
 import { NextFunction, Request, Response } from "express";
 
+interface ArticleRequest extends Request {
+    body : Article;
+}
 
 export class ArticleController implements BaseController{
+
     @Post("/article", createValidator)
-    async create(req: Request, res:Response, next: NextFunction){
+    async create(req: ArticleRequest, res:Response, next: NextFunction){
         try {
-            const article = req.body as unknown as Article
+            const article = req.body;
             const created = await articleModule.service.create(article);
             return res.status(200).json( created );
         } catch (error) {
@@ -33,9 +37,9 @@ export class ArticleController implements BaseController{
     }
 
     @Put("/article/:id", updateValidator)
-    async update(req: Request, res:Response, next:NextFunction){
+    async update(req: ArticleRequest, res:Response, next:NextFunction){
         try {
-            const article = req.body as unknown as Article
+            const article = req.body;
             article._id = req.params.id;
             const updated = await articleModule.service.update(article);
             return res.status(200).json( updated );
